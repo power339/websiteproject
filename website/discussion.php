@@ -1,122 +1,97 @@
+<?php
+require 'db.php';
+
+// Handle new post or reply
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['message'])) {
+    $message = $_POST['message'];
+    $parent_id = $_POST['parent_id'] ?? null;
+
+    $stmt = $conn->prepare("INSERT INTO discussions (message, parent_id) VALUES (?, ?)");
+    $stmt->bind_param("si", $message, $parent_id);
+    $stmt->execute();
+}
+
+// Handle delete
+if (isset($_POST['delete_id'])) {
+    $delete_id = (int)$_POST['delete_id'];
+    $conn->query("DELETE FROM discussions WHERE id = $delete_id");
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Fetch all discussions
+$threads = $conn->query("SELECT * FROM discussions ORDER BY created_at DESC");
+$posts = [];
+while ($row = $threads->fetch_assoc()) {
+    $posts[] = $row;
+}
+?>
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <title>PeerConnect Discussion</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            outfit: ['Outfit', 'sans-serif'],  /* This font is added here */
-          },
-          colors: {
-            primary: '#6366f1',
-            secondary: '#ec4899',
-          }
-        }
-      }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"> <!-- Font link added here -->
 </head>
-<body class="bg-gray-900 text-white font-outfit h-screen flex flex-col"> <!-- font-outfit class applied here -->
-
-  <!-- Navbar -->
-  <header class="bg-[#2c2f48] px-6 py-4 shadow-md flex justify-between items-center sticky top-0 z-50">
-    <div class="text-xl font-bold text-white">Peer Connections</div>
-    <nav>
-      <ul class="flex gap-6 text-md font-medium text-white">
-        <li><a href="AAindex.php" class="hover:text-indigo-300 transition">Home</a></li>
-        <li><a href="about.php" class="hover:text-indigo-300 transition">About</a></li>
-        <li><a href="review.php" class="hover:text-indigo-300 transition">Review</a></li>
-        <li><a href="discussion.php" class="text-blue-400 font-semibold">Discussion Area</a></li>
-        <li><a href="dashboard.php" class="hover:text-indigo-300  transition">Upload</a></li>
-        <li>
-          <a href="login1.php"
-             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">
-            Login
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </header>
-
-  <!-- Chat Container -->
-  <main class="flex-1 flex flex-col p-4 max-w-4xl mx-auto w-full">
-    
-    <!-- Messages Area -->
-    <div id="chat-box" class="flex-1 overflow-y-auto mb-4 p-4 bg-gray-800 rounded-xl space-y-4 shadow-inner">
-      
-      <!-- Message: User -->
-      <div class="flex justify-end">
-        <div class="flex items-start space-x-3">
-          <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xl">
-            S
-          </div>
-          <div class="bg-primary text-white p-3 rounded-lg max-w-xs shadow-md">
-            <p class="text-sm">Hey! Is anyone working on the assignment?</p>
-            <p class="text-xs mt-1 text-gray-200 text-right">You • 10:32 AM</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Message: Other -->
-      <div class="flex justify-start">
-        <div class="flex items-start space-x-3">
-          <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl">
-            A
-          </div>
-          <div class="bg-gray-700 text-white p-3 rounded-lg max-w-xs shadow-md">
-            <p class="text-sm">Yep, I started last night. Got stuck on question 3 tho 😅</p>
-            <p class="text-xs mt-1 text-gray-400">Alex • 10:34 AM</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- More messages can be added dynamically -->
+<body class="bg-gray-900 text-white font-sans p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header with Back to Home -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-indigo-400">💬 Discussion Forum</h1>
+      <a href="AAindex.php" class="text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition">
+        ← Back to Home
+      </a>
     </div>
 
-    <!-- Input Area -->
-    <form id="chat-form" class="flex gap-3">
-      <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 p-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary"/>
-      <button type="submit" class="bg-primary px-5 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">Send 🚀</button>
+    <!-- New Thread Form -->
+    <form method="POST" class="bg-gray-800 p-4 rounded-lg mb-8 shadow-lg">
+      <textarea name="message" required placeholder="Start a new discussion..." class="w-full p-3 bg-gray-700 border border-gray-600 rounded mb-4 text-white"></textarea>
+      <input type="hidden" name="parent_id" value="">
+      <button class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">Post</button>
     </form>
 
-  </main>
-
-  <!-- Scroll to bottom + Optional JS -->
-  <script>
-    const form = document.getElementById('chat-form');
-    const chatBox = document.getElementById('chat-box');
-    const input = document.getElementById('message-input');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
-
-      // Append message to chat box (simulate sending)
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'flex justify-end';
-      msgDiv.innerHTML = ` 
-        <div class="flex items-start space-x-3">
-          <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xl">
-            U
+    <!-- Display Threads -->
+    <?php foreach ($posts as $post): ?>
+      <?php if (!$post['parent_id']): ?>
+        <div class="bg-gray-800 p-4 rounded-lg mb-4 shadow-lg">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="mb-2"><?= htmlspecialchars($post['message']) ?></p>
+              <small class="text-gray-400"><?= $post['created_at'] ?></small>
+            </div>
+            <!-- Delete button for the post -->
+            <form method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+              <input type="hidden" name="delete_id" value="<?= $post['id'] ?>">
+              <button class="text-red-500 hover:text-red-700 ml-4 text-xl">Delete</button>
+            </form>
           </div>
-          <div class="bg-primary text-white p-3 rounded-lg max-w-xs shadow-md">
-            <p class="text-sm">${message}</p>
-            <p class="text-xs mt-1 text-gray-200 text-right">You • Just now</p>
-          </div>
+
+          <!-- Reply Form -->
+          <form method="POST" class="mt-3">
+            <textarea name="message" placeholder="Reply..." required class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white mb-2"></textarea>
+            <input type="hidden" name="parent_id" value="<?= $post['id'] ?>">
+            <button class="bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded text-sm">Reply</button>
+          </form>
+
+          <!-- Replies -->
+          <?php foreach ($posts as $reply): ?>
+            <?php if ($reply['parent_id'] == $post['id']): ?>
+              <div class="ml-4 mt-3 bg-gray-700 p-3 rounded flex justify-between">
+                <div>
+                  <p><?= htmlspecialchars($reply['message']) ?></p>
+                  <small class="text-gray-400"><?= $reply['created_at'] ?></small>
+                </div>
+                <!-- Delete button for the reply -->
+                <form method="POST" onsubmit="return confirm('Delete this reply?');">
+                  <input type="hidden" name="delete_id" value="<?= $reply['id'] ?>">
+                  <button class="text-red-400 hover:text-red-600 ml-4 text-lg">🗑</button>
+                </form>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
         </div>
-      `;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      input.value = '';
-    });
-  </script>
-
+      <?php endif; ?>
+    <?php endforeach; ?>
+  </div>
 </body>
 </html>
