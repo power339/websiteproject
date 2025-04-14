@@ -1,17 +1,27 @@
 <?php
 require 'db.php';
 
-// Handle file upload
-if (isset($_FILES['file'])) {
-    $filename = $_FILES['file']['name'];
-    $fileTmp = $_FILES['file']['tmp_name'];
-    $fileSize = $_FILES['file']['size'];
+// Handle file upload with passcode check
+if (isset($_FILES['file']) && isset($_POST['passcode'])) {
+    $enteredPasscode = $_POST['passcode'];
+    $correctPasscode = "file123"; // Change this to your desired passcode
 
-    $uploadDir = 'uploads/';
-    $filePath = $uploadDir . basename($filename);
+    if ($enteredPasscode !== $correctPasscode) {
+        echo "<script>alert('❌ Incorrect passcode! Upload denied.');</script>";
+    } else {
+        $filename = $_FILES['file']['name'];
+        $fileTmp = $_FILES['file']['tmp_name'];
+        $fileSize = $_FILES['file']['size'];
 
-    if (move_uploaded_file($fileTmp, $filePath)) {
-        $conn->query("INSERT INTO files (filename, size, path, uploaded_at) VALUES ('$filename', $fileSize, '$filePath', NOW())");
+        $uploadDir = 'uploads/';
+        $filePath = $uploadDir . basename($filename);
+
+        if (move_uploaded_file($fileTmp, $filePath)) {
+            $conn->query("INSERT INTO files (filename, size, path, uploaded_at) VALUES ('$filename', $fileSize, '$filePath', NOW())");
+           echo "<script>alert('✅ File uploaded successfully.');</script>";
+        } else {
+            echo "<script>alert('❌ Failed to upload file.');</script>";
+        }
     }
 }
 
@@ -81,6 +91,14 @@ $files = $conn->query("SELECT * FROM files WHERE deleted_at IS NULL ORDER BY upl
       <a href="recyclebin.php" class="text-sm font-semibold bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition">🗑 Recycle Bin</a>
     </div>
     <form action="" method="POST" enctype="multipart/form-data" class="space-y-5">
+      
+      <!-- Passcode Field Added -->
+      <div>
+        <label class="block mb-2 text-sm font-medium text-gray-300">Enter Passcode</label>
+        <input type="password" name="passcode" required placeholder="Enter passcode"
+               class="w-full bg-gray-900 text-white border border-gray-600 rounded-lg p-3" />
+      </div>
+
       <div>
         <label class="block mb-2 text-sm font-medium text-gray-300">Choose File</label>
         <input type="file" name="file" required class="w-full file:bg-indigo-600 file:text-white file:rounded file:px-4 file:py-2 bg-gray-900 text-white border border-gray-600 rounded-lg p-3 transition hover:file:bg-indigo-700" />
