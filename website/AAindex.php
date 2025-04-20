@@ -27,15 +27,8 @@ session_start();
         <li><a href="discussion.php" class="hover:text-indigo-300 transition">Discussion Area</a></li>
         <li><a href="dashboard.php" class="hover:text-indigo-300 transition">Upload</a></li>
         <li id="auth-link">
-          <?php if (isset($_SESSION['username'])): ?>
-            <span class="text-indigo-300 mr-2">👋 Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-            <!-- <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">Logout</a> -->
-          <?php else: ?>
-             <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">Logout</a>
-            <!-- <a href="login1.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">Login</a> -->
-          <?php endif; ?>
-        </li>
-      </ul>
+         <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">Logout</a>
+          </ul>
     </nav>
   </header>
 
