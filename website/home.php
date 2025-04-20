@@ -18,17 +18,11 @@
   <header class="bg-[#2c2f48] px-6 py-4 shadow-md flex justify-between items-center sticky top-0 z-50">
     <div class="text-xl font-bold text-white">PeerConnect</div>
     <nav>
-      <ul class="flex gap-6 text-sm font-medium text-white">
+    <ul class="flex gap-6 text-sm font-medium text-white items-center">
         <li><a href="AAindex.php" class="text-blue-400 font-semibold">Home</a></li>
         <li><a href="about.php" class="hover:text-indigo-300 transition">About</a></li>
-        <!-- <li><a href="review.php" class="hover:text-indigo-300 transition">Review</a></li>
-        <li><a href="discussion.php" class="hover:text-indigo-300 transition">Discussion Area</a></li>
-        <li><a href="dashboard.php" class="hover:text-indigo-300 transition">Upload</a></li> -->
-        <li id="auth-link">
-          <!-- Login button will be here, and replaced by Logout if the user is logged in -->
-           
-        </li>
-      </ul>
+        <li><a href="login1.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">Login</a></li>
+        </ul>
     </nav>
   </header>
 
@@ -61,13 +55,7 @@
     </div>
   </section>
 
-  <!-- About Us Section -->
-  <!-- <section id="about" class="bg-gray-900 py-16 px-6">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold text-pink-400 mb-4">👥 About Us</h2>
-      <p class="text-gray-300 text-lg">PeerConnect was founded with a mission to build a collaborative space where students can learn together, help each other, and succeed. We believe in the power of shared knowledge and peer support to achieve academic goals and personal growth.</p>
-    </div>
-  </section> -->
+  
 
   <!-- Footer -->
   <footer class="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-900 text-white py-16 px-6">
@@ -104,31 +92,6 @@
     <div class="text-center mt-10 text-sm text-indigo-300">© 2025 PeerConnect. Crafted with 💙 for learners everywhere.</div>
   </footer>
 
-  <script>
-    // Check if the user is logged in by checking localStorage
-    function checkLoginStatus() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      const authLink = document.getElementById('auth-link');
-
-      if (isLoggedIn) {
-        // User is logged in, show logout button
-        authLink.innerHTML = '<a href="logout.php" onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">Logout</a>';
-      } else {
-        // User is not logged in, show login button
-        authLink.innerHTML = '<a href="login1.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">Login</a>';
-      }
-    }
-
-    function logout() {
-      // Remove user login status from localStorage
-      localStorage.removeItem('isLoggedIn');
-      // Redirect to home page or refresh
-      window.location.reload();
-    }
-
-    // Initialize login status check on page load
-    window.onload = checkLoginStatus;
-  </script>
-
+  
 </body>
 </html>
