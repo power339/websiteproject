@@ -50,7 +50,7 @@ $conn->close();
   <header class="bg-[#2c2f48] px-6 py-4 flex justify-between items-center sticky top-0 z-50">
     <div class="text-xl font-bold text-white">PeerConnect</div>
     <nav>
-      <a href="AAindex.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+      <a href="home.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition">
         Back
       </a>
     </nav>
